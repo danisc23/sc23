@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  nginx:
+    image: nginx-sc23
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./index.html:/usr/share/nginx/html/index.html
+    depends_on:
+      - renting
+      - padel-api
+    networks:
+      - the-main-network
+
+  renting:
+    image: astro-renting  # Imagen de tu proyecto Astro
+    build:
+      context: ../renting-data-generator
+      dockerfile: Dockerfile
+    networks:
+      - the-main-network
+
+  padel-radar:
+    image: padel-radar
+    build:
+      context: ../padel-radar-app
+      dockerfile: Dockerfile
+    depends_on:
+      - padel-api
+    networks:
+      - the-main-network
+
+  padel-api:
+    environment:
+      - PT_ENV=${PT_ENV}
+      - FLASK_ENV=${FLASK_ENV}
+      - FLASK_DEBUG=${FLASK_DEBUG}
+      - LOCATION_IQ_API_KEY=${LOCATION_IQ_API_KEY}
+      - CACHE_REDIS_HOST=padel-redis
+    image: padel-api
+    build:
+      context: ../padel-tavernes
+      dockerfile: Dockerfile
+    volumes:
+      - ../padel-tavernes/app:/app/app
+    depends_on:
+      - padel-redis
+      - padel-postgres
+    networks:
+      - the-main-network
+
+  padel-redis:
+    image: redis:alpine
+    networks:
+      - the-main-network
+
+  padel-postgres:
+    image: postgres:alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    networks:
+      - the-main-network
+
+networks:
+  the-main-network:
+    driver: bridge
