@@ -41,6 +41,7 @@ services:
   padel-api:
     environment:
       - PT_ENV=${PT_ENV}
+      - PT_ALLOWED_ORIGINS=${PT_ALLOWED_ORIGINS}
       - FLASK_ENV=${FLASK_ENV}
       - FLASK_DEBUG=${FLASK_DEBUG}
       - LOCATION_IQ_API_KEY=${LOCATION_IQ_API_KEY}
