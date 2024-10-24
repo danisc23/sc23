@@ -3,18 +3,227 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Under Construction? Looks good to me!</title>
+    <meta name="description" content="Portfolio of Daniel, a Software Developer & Technology Enthusiast showcasing projects in Astro, Flask, Expo, and game development.">
+    <meta name="keywords" content="software developer, portfolio, projects, Astro, Flask, Expo, game development">
+    <meta name="author" content="Daniel Sánchez Campillos">
+    
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sc23.site/">
+    <meta property="og:title" content="Daniel's Portfolio - Software Developer & Technology Enthusiast">
+    <meta property="og:description" content="Explore Daniel's projects in web development, APIs, mobile apps, and game development. Open source enthusiast and technology innovator.">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://sc23.site/">
+    <meta property="twitter:title" content="Daniel's Portfolio - Software Developer & Technology Enthusiast">
+    <meta property="twitter:description" content="Explore Daniel's projects in web development, APIs, mobile apps, and game development. Open source enthusiast and technology innovator.">
+    <title>Daniel's Portfolio - Welcome</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <script
+        data-name="BMC-Widget"
+        data-cfasync="false"
+        src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+        data-id="danisc23"
+        data-description="Support me on Buy me a coffee!"
+        data-message="Happy? Buy me a ☕️"
+        data-color="#FF813F"
+        data-position="Right"
+        data-x_margin="18"
+        data-y_margin="18"
+    ></script>
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --card-bg: #2a2a2a;
+            --text-color: #e0e0e0;
+            --highlight-color: #FF813F;
+            --secondary-color: #4a4a4a;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background: var(--bg-color);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        header {
+            text-align: center;
+            padding: 3rem 0;
+        }
+        h1 {
+            margin: 0;
+            font-size: 3rem;
+            font-weight: 600;
+            color: var(--highlight-color);
+        }
+        .subtitle {
+            font-size: 1.2rem;
+            margin-top: 0.5rem;
+            font-weight: 300;
+        }
+        main {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-top: 2rem;
+        }
+        .projects {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+        .project-card {
+            background: var(--secondary-color);
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .project-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+        }
+        .project-title {
+            color: var(--highlight-color);
+            margin-top: 0;
+            font-size: 1.5rem;
+        }
+        .project-description {
+            color: var(--text-color);
+            margin-bottom: 1rem;
+        }
+        .project-tech {
+            font-weight: 600;
+            color: var(--highlight-color);
+            background-color: rgba(255,255,255,0.1);
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            border-radius: 15px;
+            display: inline-block;
+        }
+        .project-link {
+            display: inline-block;
+            background-color: var(--highlight-color);
+            color: var(--bg-color);
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+            font-weight: 600;
+            align-self: center;
+            margin-top: auto;
+        }
+        .project-link:hover {
+            background-color: #e67a3e;
+        }
+        .about {
+            margin-top: 3rem;
+            text-align: center;
+        }
+        .profile-link {
+            color: var(--highlight-color);
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s ease;
+        }
+        .profile-link:hover {
+            color: #e67a3e;
+        }
+        .social-icons {
+            position: fixed;
+            bottom: 18px;
+            left: 18px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+        .social-icons a {
+            text-decoration: none;
+            font-size: 32px;
+            color: var(--text-color);
+            transition: color 0.3s ease;
+        }
+        .social-icons a:hover {
+            color: var(--highlight-color);
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 1rem;
+            }
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        .gradient-highlight {
+            background: linear-gradient(90deg, var(--highlight-color), #ffd200);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello, and welcome to this (currently) simple HTML page!</h1>
-    <p>Here are some of the projects I've been working on recently:</p>
-    <ul>
-        <li><a href="https://renting.sc23.site">Renting Data Generator [Astro]</a></li>
-        <li><a href="https://padel-api.sc23.site/docs">Padel API [Flask]</a></li>
-        <li><a href="https://padel-radar.sc23.site">Padel APP Search [Expo]</a></li>
-        <li><a href="https://danisc23.itch.io/genesis-megatetris">Genesis Megatetris [C] (You can play it online or even on your Sega Megadrive!)</a></li>
-    </ul>
-    <p>Most of my projects are open source, so feel free to check them out on my <a href="https://github.com/danisc23" target="_blank">GitHub</a> profile!</p>
-    <p>Also, if you are looking for my resume, you can check my <a href="https://www.linkedin.com/in/dsc/" target="_blank">LinkedIn</a> profile. Feel free to contact me!</p>
+    <header>
+        <div class="container">
+            <h1>Daniel's Portfolio</h1>
+            <p class="subtitle">Software Developer & Technology Enthusiast</p>
+        </div>
+    </header>
+    <main class="container">
+        <section class="projects">
+            <article class="project-card">
+                <h2 class="project-title">Renting Data Generator</h2>
+                <p class="project-description">An <span class="project-tech">Astro</span> website that <span class="gradient-highlight">generates valid random data for vehicle renting providers</span> including VAT numbers, VINs, Licence Plates, Tentant IDs, and more.</p>
+                <a href="https://renting.sc23.site" class="project-link">View Project</a>
+            </article>
+            <article class="project-card">
+                <h2 class="project-title">Padel API</h2>
+                <p class="project-description">API developed with <span class="project-tech">Flask</span> for padel-related services. Basically this is the <span class="gradient-highlight">backend for the previous project, Padel Radar</span>.</p>
+                <a href="https://padel-api.sc23.site/docs" class="project-link">View Documentation</a>
+            </article>
+            <article class="project-card">
+                <h2 class="project-title">Padel Radar</h2>
+                <p class="project-description">Padel search APP for Android and iOS developed with <span class="project-tech">Expo</span> that allows users to <span class="gradient-highlight">find nearby padel courts and clubs</span> through different padel services like Playtomic, Matchi, or WebsDePadel.</p>
+                <a href="https://padel-radar.sc23.site" class="project-link">Explore App</a>
+            </article>
+            <article class="project-card">
+                <h2 class="project-title">Genesis Megatetris</h2>
+                <p class="project-description">This is a <span class="gradient-highlight">Sega Megadrive/Genesis ASCII Tetris game</span> developed in <span class="project-tech">C</span> and <span class="project-tech">SGDK</span>, you can play it online, download the ROM or use your real Megadrive console.</p>
+                <a href="https://danisc23.itch.io/genesis-megatetris" class="project-link">Play Now</a>
+            </article>
+        </section>
+        <section class="about">
+            <p>Most of my projects are open source. Feel free to explore them on my <a href="https://github.com/danisc23" target="_blank" rel="noopener noreferrer" class="profile-link">GitHub</a> profile!</p>
+            <p>If you're looking for my resume, you can check my <a href="https://www.linkedin.com/in/dsc/" target="_blank" rel="noopener noreferrer" class="profile-link">LinkedIn</a> profile. Don't hesitate to contact me!</p>
+        </section>
+    </main>
+    <footer>
+        <div class="social-icons">
+            <a href="https://github.com/danisc23" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-github"></i>
+            </a>
+            <a href="https://x.com/d23sc" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-twitter"></i>
+            </a>
+            <a href="https://linkedin.com/in/dsc" target="_blank" rel="noopener noreferrer">
+                <i class="fab fa-linkedin"></i>
+            </a>
+        </div>
+    </footer>
 </body>
 </html>
