@@ -18,13 +18,24 @@ services:
       - renting
       - padel-api
       - wise-frog
+      - status
+    networks:
+      - the-main-network
+
+  status:
+    image: status
+    build:
+      context: projects/docker-stats-fastapi
+      dockerfile: Dockerfile
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - the-main-network
 
   renting:
     image: astro-renting
     build:
-      context: ../renting-data-generator
+      context: projects/renting-data-generator
       dockerfile: Dockerfile
     networks:
       - the-main-network
@@ -32,7 +43,7 @@ services:
   wise-frog:
     image: wise-frog
     build:
-      context: ../wise-frog
+      context: projects/wise-frog
       dockerfile: Dockerfile
     environment:
       - OPENAI_API_KEY=${OPENAI_API_KEY}
@@ -43,7 +54,7 @@ services:
   padel-radar:
     image: padel-radar
     build:
-      context: ../padel-radar-app
+      context: projects/padel-radar-app
       dockerfile: Dockerfile
     depends_on:
       - padel-api
@@ -60,7 +71,7 @@ services:
       - CACHE_REDIS_HOST=padel-redis
     image: padel-api
     build:
-      context: ../padel-tavernes
+      context: projects/padel-tavernes
       dockerfile: Dockerfile
     volumes:
       - ../padel-tavernes/app:/app/app
@@ -74,15 +85,6 @@ services:
     image: redis:alpine
     networks:
       - the-main-network
-
-  # padel-postgres:
-  #   image: postgres:alpine
-  #   environment:
-  #     POSTGRES_USER: ${POSTGRES_USER}
-  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-  #     POSTGRES_DB: ${POSTGRES_DB}
-  #   networks:
-  #     - the-main-network
 
 networks:
   the-main-network:
