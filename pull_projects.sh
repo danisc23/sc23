@@ -1,6 +1,6 @@
 #!/bin/bash
 
-GITHUB_USER="https://github.com/danisc23"
+GITHUB_USER="git@github.com:danisc23"
 
 PROJECTS=(
   "$GITHUB_USER/renting-data-generator.git"
