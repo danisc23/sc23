@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   nginx:
     image: nginx-sc23
@@ -19,6 +17,7 @@ services:
       - padel-api
       - wise-frog
       - status
+      - ligapb
     networks:
       - the-main-network
 
@@ -58,6 +57,14 @@ services:
       dockerfile: Dockerfile
     depends_on:
       - padel-api
+    networks:
+      - the-main-network
+
+  ligapb:
+    image: ligapb
+    build:
+      context: projects/ligapb
+      dockerfile: Dockerfile
     networks:
       - the-main-network
 
