@@ -15,6 +15,7 @@ services:
     depends_on:
       - renting
       - padel-api
+      - padel-radar
       - wise-frog
       - status
       - ligapb

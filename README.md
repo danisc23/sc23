@@ -46,6 +46,24 @@ I'm doing this repository public to share my Nginx configuration for local devel
 2. **Nginx Configuration for Local Development**
     - Modify your `nginx.conf` to add your main domain and subdomains replacing `sc23.local` with your domain `yoursite.local`, this should match your projects in the `docker-compose.yml` file.
 
+3. **SSL Certificates Setup**
+    - To run with HTTPS locally, you need local certificates.
+    - Install mkcert if you don't have it:
+      ```bash
+      brew install mkcert nss
+      mkcert -install
+      ```
+    - Then generate certificates for your .local domains:
+      ```bash
+      mkcert yoursite.local aproject.yoursite.local anotherproject.yoursite.local ...
+      ```
+      This will create files like `yoursite.local+2.pem` and `yoursite.local+2-key.pem`.
+    - Rename them to match your Nginx configuration:
+      ```bash
+      cp yoursite.local+2.pem yoursite.crt
+      cp yoursite.local+2-key.pem yoursite.key
+      ```
+
 ### **VPS Deployment Setup**
 
 1. **Wildcard HTTPS Certification**
