@@ -20,6 +20,14 @@ I'm doing this repository public to share my Nginx configuration for local devel
 
 ### **Local Development Setup**
 
+0. **Automated Setup Script (Optional)**
+    This will pull updates for your projects, update your `/etc/hosts`, generate local SSL certificates using `mkcert`, and set up the necessary files for local development.
+
+    - Run `chmod +x dev_init.sh`.
+    - Execute the script with `./dev_init.sh`
+
+    If there are any issues try the manual steps below.
+
 1. **Update `/etc/hosts` if you want to use the subdomains locally**
     ```bash
     sudo vi /etc/hosts
