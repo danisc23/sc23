@@ -18,6 +18,7 @@ services:
       - padel-radar
       - wise-frog
       - status
+      - xml-diff
     networks:
       - the-main-network
 
@@ -83,6 +84,14 @@ services:
 
   padel-redis:
     image: redis:alpine
+    networks:
+      - the-main-network
+
+  xml-diff:
+    image: xml-diff
+    build:
+      context: projects/xml-diff-comparator
+      dockerfile: Dockerfile
     networks:
       - the-main-network
 

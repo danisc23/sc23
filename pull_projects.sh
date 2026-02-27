@@ -8,6 +8,7 @@ PROJECTS=(
   "$GITHUB_USER/padel-radar-app.git"
   "$GITHUB_USER/wise-frog.git"
   "$GITHUB_USER/docker-stats-fastapi.git"
+  "$GITHUB_USER/xml-diff-comparator.git"
 )
 
 mkdir -p projects
