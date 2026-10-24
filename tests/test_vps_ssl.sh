@@ -12,6 +12,12 @@ trap 'nginx -s quit -c "$TEST_ROOT/nginx.conf" 2>/dev/null || true; rm -rf "$TES
 mkdir -p "$TEST_ROOT/repo/certs" "$TEST_ROOT/bin" "$TEST_ROOT/fixtures" /etc/systemd/system
 # Nginx accesses host fixture paths directly; production mounts the webroot leaf.
 chmod 755 "$TEST_ROOT"
+cat > /etc/systemd/system/docker.service <<'EOF'
+[Service]
+Type=oneshot
+ExecStart=/bin/true
+RemainAfterExit=yes
+EOF
 cp vps_ssl.sh nginx.conf docker-compose.yml "$TEST_ROOT/repo/"
 cp -R html "$TEST_ROOT/repo/html"
 export CURL_CA_BUNDLE="$TEST_ROOT/fixtures/ca.crt"
@@ -118,6 +124,10 @@ grep -q 'enable --now sc23-ssl-renew.timer' "$TEST_ROOT/systemctl.log"
 grep -q '^OnCalendar=\*-\*-\* 03,15:00:00$' /etc/systemd/system/sc23-ssl-renew.timer
 grep -q '^dry-run$' "$TEST_ROOT/certbot.log"
 run_ssl check
+echo 'TEST systemd: rejects the quoted WorkingDirectory regression on Debian 11'
+cp /etc/systemd/system/sc23-ssl-renew.service "$TEST_ROOT/invalid-working-directory.service"
+sed -i '/^Type=oneshot/a WorkingDirectory="/root/sc23"' "$TEST_ROOT/invalid-working-directory.service"
+expect_failure systemd-analyze verify "$TEST_ROOT/invalid-working-directory.service"
 echo 'TEST main site: serves the existing repository index.html unchanged'
 curl --noproxy '*' --fail --silent --show-error https://sc23.site/ > "$TEST_ROOT/served-index.html"
 cmp /workspace/html/index.html "$TEST_ROOT/served-index.html"

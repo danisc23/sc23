@@ -143,7 +143,6 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-WorkingDirectory="$escaped_path"
 ExecStart=/bin/bash "$escaped_path/vps_ssl.sh" renew
 TimeoutStartSec=20min
 UMask=0077
@@ -160,6 +159,7 @@ Persistent=true
 [Install]
 WantedBy=timers.target
 EOF
+    systemd-analyze verify /etc/systemd/system/sc23-ssl-renew.service /etc/systemd/system/sc23-ssl-renew.timer
     systemctl daemon-reload
     systemctl enable --now sc23-ssl-renew.timer
 }
@@ -170,7 +170,7 @@ if [[ "$ACTION" == help || "$ACTION" == --help ]]; then
 fi
 case "$ACTION" in setup|renew|check|dry-run|rollback) ;; *) die "Unknown action: $ACTION" ;; esac
 [[ $EUID -eq 0 ]] || die 'Run this script as root (sudo bash vps_ssl.sh ...).'
-for program in docker openssl curl flock systemctl timeout; do
+for program in docker openssl curl flock systemctl systemd-analyze timeout; do
     command -v "$program" >/dev/null || die "Missing prerequisite: $program"
 done
 docker compose version >/dev/null || die 'Docker Compose v2 is required.'
