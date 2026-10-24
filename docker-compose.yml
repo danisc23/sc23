@@ -12,6 +12,7 @@ services:
       - ./html:/usr/share/nginx/html
       - ./sc23.key:/etc/nginx/ssl/sc23.key
       - ./sc23.crt:/etc/nginx/ssl/sc23.crt
+      - ./certs/acme-webroot:/var/www/certbot:ro
     depends_on:
       - renting
       - padel-api

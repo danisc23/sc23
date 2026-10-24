@@ -1,102 +1,91 @@
-## **SC23 Dockerized Nginx Configuration**
+# SC23
 
-This project uses an Nginx configuration to map subdomains for each project in the Docker Compose setup. The configuration supports both local development (`sc23.local`) by updating `/etc/hosts` and deployment on a VPS (`sc23.site`) with wildcard HTTPS certification. For more details, refer to the [docker-compose.yml](../docker-compose.yml) file in the root of the repository.
+Docker Compose applications behind Nginx: local HTTPS with mkcert and public HTTPS with Let's Encrypt.
 
-I'm doing this repository public to share my Nginx configuration for local development and VPS deployment so you can use it as a reference for your projects, I don't intend to do a cookie-cutter solution for everyone, but I hope it helps you to understand how to configure Nginx for your projects with the following instructions.
+## Configuration
 
-### **General Setup**
+- Main site: `html/index.html` and `html/assets/`, served directly by Nginx.
+- Projects: `pull_projects.sh` and `projects/`.
+- Services: `docker-compose.yml`.
+- Domains and routes: `nginx.conf`.
+- Application secrets: `.env` (not committed).
 
-1. **Set your projects to be pulled from Git**
-    - Modify `pull_projects.sh` and add your projects.
-    - Run `chmod +x pull_projects.sh`.
-    - Run `./pull_projects.sh` to pull your projects.
-    - This will clone your projects into the `projects` directory.
+## Local development
 
-2. **Update the `docker-compose.yml` file**
-    - Replace `sc23` with your domain name `yoursite`.
-    - Remove all the services you don't need.
-    - Add your own, make the context to the Dockerfile match each project you pulled.
-    - You can use a `.env` file to store your environment variables.
+Requires Homebrew, Git, mkcert, Docker and `docker-compose` for the existing setup script.
 
-### **Local Development Setup**
+```bash
+bash dev_init.sh
+docker compose up -d --build
+```
 
-0. **Automated Setup Script (Optional)**
-    This will pull updates for your projects, update your `/etc/hosts`, generate local SSL certificates using `mkcert`, and set up the necessary files for local development.
+Open `https://sc23.local` or the configured `.local` subdomains.
+On Windows, configure hosts in `C:\Windows\System32\drivers\etc\hosts` and generate certificates with mkcert manually.
+Use `update_certs.sh` only for local development; it replaces `sc23.crt` and `sc23.key`.
 
-    - Run `chmod +x dev_init.sh`.
-    - Execute the script with `./dev_init.sh`
+## VPS deployment
 
-    If there are any issues try the manual steps below.
+Requires Debian 11-compatible Linux, Docker Compose v2, systemd, Git, curl, OpenSSL and flock.
+All public domains must point to the VPS (including any AAAA records); open ports 80 and 443.
+Root must have Git access to the application repositories.
 
-1. **Update `/etc/hosts` if you want to use the subdomains locally**
-    ```bash
-    sudo vi /etc/hosts
-    ```
-    Add the following lines:
-    ```
-    ##
-    # Host Database
-    #
-    # localhost is used to configure the loopback interface
-    # when the system is booting.  Do not change this entry.
-    ##
-    127.0.0.1       localhost
-    255.255.255.255 broadcasthost
-    ::1             localhost
-    # 👇 Starting Here 👇
-    127.0.0.1       yoursite.local
-    127.0.0.1       aproject.yoursite.local
-    127.0.0.1       anotherproject.yoursite.local
-    # 👆 and so on...👆
-    ```
-    For Windows, you can edit the `hosts` file located at `C:\Windows\System32\drivers\etc\hosts`.
+After committing and pushing the changes, run on the VPS:
 
-2. **Nginx Configuration for Local Development**
-    - Modify your `nginx.conf` to add your main domain and subdomains replacing `sc23.local` with your domain `yoursite.local`, this should match your projects in the `docker-compose.yml` file.
+```bash
+cd /root/sc23
+git pull --ff-only
+sudo bash vps_deploy.sh your-email@example.com
+```
 
-3. **SSL Certificates Setup**
-    - To run with HTTPS locally, you need local certificates.
-    - Install mkcert if you don't have it:
-      ```bash
-      brew install mkcert nss
-      mkcert -install
-      ```
-    - Then generate certificates for your .local domains:
-      ```bash
-      mkcert yoursite.local aproject.yoursite.local anotherproject.yoursite.local ...
-      ```
-      This will create files like `yoursite.local+2.pem` and `yoursite.local+2-key.pem`.
-    - Rename them to match your Nginx configuration:
-      ```bash
-      cp yoursite.local+2.pem yoursite.crt
-      cp yoursite.local+2-key.pem yoursite.key
-      ```
+This updates, builds and deploys the applications, then sets up HTTPS.
+Nginx is briefly recreated; application containers remain running during TLS setup.
 
-### **VPS Deployment Setup**
+To configure only HTTPS after the applications are deployed:
 
-1. **Wildcard HTTPS Certification**
-    - Use a service like Let's Encrypt to obtain a wildcard certificate for `*.yoursite.com`.
+```bash
+sudo bash vps_ssl.sh setup your-email@example.com
+```
 
-2. **Nginx Configuration for VPS**
-    - Ensure your `nginx.conf` maps the subdomains correctly for `yoursite.com` and includes the wildcard HTTPS certificate.
+- Replace the email with your real contact address. Setup accepts the [Let's Encrypt agreement](https://letsencrypt.org/repository/).
+- Covers concrete `.site` names from `nginx.conf`; `.local` names and wildcard names are excluded.
+- For a new subdomain, configure DNS, the application and Nginx, then rerun setup.
+- Checks renewal twice daily through `sc23-ssl-renew.timer`; renews when due and reloads Nginx. Applications are not updated by the timer.
+- Certificates, ACME state, logs and backups stay in `certs/`, ignored by Git. Keep the repository at the same path.
+- Existing host Certbot jobs are left unchanged. The Certbot image version is pinned in `vps_ssl.sh`.
 
-3. **Find and replace**
-    - Replace all instances of `sc23.site` with your domain name `yoursite.com`.
-    - Change the certificate paths to your wildcard certificate paths.
+## Verify and recover
 
-### **Running the services**
+```bash
+sudo bash vps_ssl.sh check
+sudo bash vps_ssl.sh dry-run
+systemctl list-timers sc23-ssl-renew.timer
+journalctl -u sc23-ssl-renew.service -n 50 --no-pager
+```
 
-1. **Build the services**
-    ```bash
-    docker-compose up --build
-    ```
+Setup verifies HTTP challenges, trusted HTTPS, the served certificate and a staging renewal before enabling the timer.
+For a production trial, back up the running Nginx image, configuration and certificates outside the checkout, then use `vps_ssl.sh setup` to leave applications unchanged.
+Check the application pages in a browser too; a successful TLS check does not validate application behavior.
 
-2. **Testing URLs**
-    - Open your browser and navigate to `http://yoursite.local` to see the main domain locally.
-    - If you are in your VPS, you should be able to see the main domain `https://yoursite.com`.
+Restore the original certificate and disable automatic renewal:
 
-2. **Stop the services**
-    ```bash
-    docker-compose down
-    ```
+```bash
+sudo bash vps_ssl.sh rollback
+```
 
+The original certificate may already be expired. This command restores certificates only; use the deployment backup to recover Nginx configuration or its image.
+After HTTPS and renewal checks pass, cancel only the paid SSL add-on according to its contract; keep the VPS and domain active.
+
+## Tests
+
+```bash
+docker build -f tests/vps-ssl.Dockerfile -t sc23-ssl-test .
+docker run --rm -v "$PWD:/workspace:ro" sc23-ssl-test
+```
+
+Debian 11, ShellCheck and real Nginx HTTP/TLS tests. ACME issuance and systemd are simulated; no VPS changes.
+
+## Stop
+
+```bash
+docker compose down
+```
