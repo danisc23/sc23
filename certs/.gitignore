@@ -1,0 +1,3 @@
+# ACME accounts, private keys, challenges, logs and backups stay on the VPS.
+*
+!.gitignore
