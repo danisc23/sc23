@@ -1,6 +1,4 @@
-#!/usr/bin/env bash
-set -Eeuo pipefail
-cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
+#!/bin/bash
 
 GITHUB_USER="git@github.com:danisc23"
 
@@ -22,7 +20,9 @@ for PROJECT in "${PROJECTS[@]}"; do
 
   if [ -d "$PROJECT_NAME" ]; then
     echo "Pulling: $PROJECT_NAME"
-    git -C "$PROJECT_NAME" pull --ff-only
+    cd "$PROJECT_NAME"
+    git pull
+    cd ..
   else
     echo "New project found, Cloning: $PROJECT_NAME"
     git clone "$PROJECT"

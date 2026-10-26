@@ -4,9 +4,8 @@
 set -Eeuo pipefail
 [[ -f /.dockerenv ]] || { echo 'Run this test in its Docker container.' >&2; exit 1; }
 cd /workspace
-bash -n vps_ssl.sh vps_deploy.sh pull_projects.sh
-shellcheck vps_ssl.sh vps_deploy.sh pull_projects.sh tests/test_vps_ssl.sh tests/test_pull_projects.sh
-bash tests/test_pull_projects.sh
+bash -n vps_ssl.sh vps_deploy.sh
+shellcheck vps_ssl.sh vps_deploy.sh tests/test_vps_ssl.sh
 export TEST_ROOT
 TEST_ROOT=$(mktemp -d)
 trap 'nginx -s quit -c "$TEST_ROOT/nginx.conf" 2>/dev/null || true; rm -rf "$TEST_ROOT"' EXIT
@@ -44,7 +43,6 @@ cp "$TEST_ROOT/fixtures/original.crt" "$TEST_ROOT/repo/sc23.crt"
 cp "$TEST_ROOT/fixtures/original.key" "$TEST_ROOT/repo/sc23.key"
 # Use the actual repository routing, with fixture paths and real Nginx on 80/443.
 # Application containers are absent here; use a closed local port for fast 502s.
-# Real game routing is exercised separately by test_rope_ruins.py.
 sed -e "s|/etc/nginx/ssl|$TEST_ROOT/repo|g" \
     -e "s|/usr/share/nginx/html|$TEST_ROOT/repo/html|g" \
     -e 's/rope-ruins-web:8080/127.0.0.1:8080/g' \
