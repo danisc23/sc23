@@ -9,6 +9,7 @@ PROJECTS=(
   "$GITHUB_USER/wise-frog.git"
   "$GITHUB_USER/docker-stats-fastapi.git"
   "$GITHUB_USER/xml-diff-comparator.git"
+  "$GITHUB_USER/hook-rush.git"
 )
 
 mkdir -p projects
