@@ -20,6 +20,8 @@ services:
       - wise-frog
       - status
       - xml-diff
+      - rope-ruins
+      - rope-ruins-web
     networks:
       - the-main-network
 
@@ -95,6 +97,56 @@ services:
       dockerfile: Dockerfile
     networks:
       - the-main-network
+
+  rope-ruins:
+    image: sc23-rope-ruins:local
+    build:
+      context: projects/hook-rush
+      dockerfile: docker/source.Dockerfile
+      target: server
+    platform: linux/amd64
+    expose:
+      - "24567"
+    networks:
+      - the-main-network
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    init: true
+    stop_grace_period: 10s
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
+
+  rope-ruins-web:
+    image: sc23-rope-ruins-web:local
+    build:
+      context: projects/hook-rush
+      dockerfile: docker/source.Dockerfile
+      target: web
+      args:
+        WEB_ENDPOINT: wss://sc23.site/rope/
+    platform: linux/amd64
+    expose:
+      - "8080"
+    networks:
+      - the-main-network
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp:size=64m,mode=1777
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    logging:
+      driver: json-file
+      options:
+        max-size: "5m"
+        max-file: "2"
 
 networks:
   the-main-network:

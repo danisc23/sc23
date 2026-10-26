@@ -53,6 +53,48 @@ sudo bash vps_ssl.sh setup your-email@example.com
 - Certificates, ACME state, logs and backups stay in `certs/`, ignored by Git. Keep the repository at the same path.
 - Existing host Certbot jobs are left unchanged. The Certbot image version is pinned in `vps_ssl.sh`.
 
+## Rope Ruins
+
+`pull_projects.sh` clones/updates `danisc23/hook-rush` into `projects/hook-rush`.
+Its `docker/source.Dockerfile` builds the `rope-ruins` dedicated server and
+`rope-ruins-web` browser client from the same checkout. No Windows build or
+manual extraction of `dist/` is required; the first build downloads the pinned
+Godot toolchain. Docker layers cache it for later builds.
+
+SC23 owns the two Compose services, private networking and public routing:
+
+- `https://roperuins.sc23.site` serves the browser client (local name: `roperuins.sc23.local`).
+- `wss://sc23.site/rope/` forwards to the server's private TCP port 24567.
+- `WEB_ENDPOINT` in `docker-compose.yml` configures the browser's `server.js`.
+- `nginx.conf` owns the exact Origin allowlist and connection/handshake limits.
+
+The local SC23 HTTPS setup uses the same public WSS endpoint. To play against
+the local SC23 server, override the web build argument with
+`WEB_ENDPOINT=wss://sc23.local/rope/` and rebuild the web service. The game's
+standalone HTTP preview remains in its own repository.
+
+Publish the game repository, including `docker/source.Dockerfile`, before
+deploying this integration. Point the new public subdomain to the VPS before
+running `vps_deploy.sh`: the existing TLS automation discovers it in
+`nginx.conf` and includes it in issuance/renewal. Do not expose port 24567 or
+copy game-provided nginx overlays into this repository.
+
+For an application-only update when the certificate already covers the domain:
+
+```bash
+bash pull_projects.sh
+docker compose build rope-ruins rope-ruins-web
+docker compose up -d --no-deps rope-ruins rope-ruins-web
+docker compose exec -T nginx nginx -t
+docker compose exec -T nginx nginx -s reload
+```
+
+Rebuild both images together for protocol changes; connected games may need
+to reconnect after a server restart. To roll back, restore the previous game
+revision and rebuild both images. To remove the integration, restore SC23's
+previous Compose/nginx configuration and recreate Nginx; leave certificates
+intact and stop only the two game services.
+
 ## Verify and recover
 
 ```bash
@@ -83,6 +125,19 @@ docker run --rm -v "$PWD:/workspace:ro" sc23-ssl-test
 ```
 
 Debian 11, ShellCheck and real Nginx HTTP/TLS tests. ACME issuance and systemd are simulated; no VPS changes.
+The suite also checks project cloning, fast-forward updates and Git failures.
+
+After building the game images, verify the real web and WebSocket routes in
+disposable containers (requires Python 3 and OpenSSL):
+
+```bash
+docker compose build rope-ruins rope-ruins-web
+python3 tests/test_rope_ruins.py
+```
+
+This uses the repository's actual nginx configuration with temporary certificates,
+an isolated Docker network and a random loopback port. It checks the main site,
+game HTML/WASM, configured endpoint, successful WSS upgrades and rejected origins.
 
 ## Stop
 

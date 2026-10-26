@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -Eeuo pipefail
+cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 
 GITHUB_USER="git@github.com:danisc23"
 
@@ -9,6 +11,7 @@ PROJECTS=(
   "$GITHUB_USER/wise-frog.git"
   "$GITHUB_USER/docker-stats-fastapi.git"
   "$GITHUB_USER/xml-diff-comparator.git"
+  "$GITHUB_USER/hook-rush.git"
 )
 
 mkdir -p projects
@@ -19,9 +22,7 @@ for PROJECT in "${PROJECTS[@]}"; do
 
   if [ -d "$PROJECT_NAME" ]; then
     echo "Pulling: $PROJECT_NAME"
-    cd "$PROJECT_NAME"
-    git pull
-    cd ..
+    git -C "$PROJECT_NAME" pull --ff-only
   else
     echo "New project found, Cloning: $PROJECT_NAME"
     git clone "$PROJECT"

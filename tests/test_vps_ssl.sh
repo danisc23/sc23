@@ -4,8 +4,9 @@
 set -Eeuo pipefail
 [[ -f /.dockerenv ]] || { echo 'Run this test in its Docker container.' >&2; exit 1; }
 cd /workspace
-bash -n vps_ssl.sh vps_deploy.sh
-shellcheck vps_ssl.sh vps_deploy.sh tests/test_vps_ssl.sh
+bash -n vps_ssl.sh vps_deploy.sh pull_projects.sh
+shellcheck vps_ssl.sh vps_deploy.sh pull_projects.sh tests/test_vps_ssl.sh tests/test_pull_projects.sh
+bash tests/test_pull_projects.sh
 export TEST_ROOT
 TEST_ROOT=$(mktemp -d)
 trap 'nginx -s quit -c "$TEST_ROOT/nginx.conf" 2>/dev/null || true; rm -rf "$TEST_ROOT"' EXIT
@@ -24,7 +25,7 @@ export CURL_CA_BUNDLE="$TEST_ROOT/fixtures/ca.crt"
 openssl req -x509 -nodes -newkey rsa:2048 -days 2 -subj '/CN=SC23 Test CA' \
     -keyout "$TEST_ROOT/fixtures/ca.key" -out "$CURL_CA_BUNDLE" 2>/dev/null
 
-domain_names=(sc23.site renting.sc23.site padel-api.sc23.site padel-radar.sc23.site wise-frog.sc23.site status.sc23.site xml-comparator.sc23.site)
+domain_names=(sc23.site renting.sc23.site padel-api.sc23.site padel-radar.sc23.site wise-frog.sc23.site status.sc23.site xml-comparator.sc23.site roperuins.sc23.site)
 for name in "${domain_names[@]}" renting padel-api padel-radar wise-frog status xml-diff; do
     printf '127.0.0.1 %s\n' "$name" >> /etc/hosts
 done
@@ -42,8 +43,12 @@ make_cert missing-domain DNS:sc23.site
 cp "$TEST_ROOT/fixtures/original.crt" "$TEST_ROOT/repo/sc23.crt"
 cp "$TEST_ROOT/fixtures/original.key" "$TEST_ROOT/repo/sc23.key"
 # Use the actual repository routing, with fixture paths and real Nginx on 80/443.
+# Application containers are absent here; use a closed local port for fast 502s.
+# Real game routing is exercised separately by test_rope_ruins.py.
 sed -e "s|/etc/nginx/ssl|$TEST_ROOT/repo|g" \
     -e "s|/usr/share/nginx/html|$TEST_ROOT/repo/html|g" \
+    -e 's/rope-ruins-web:8080/127.0.0.1:8080/g' \
+    -e 's/rope-ruins:24567/127.0.0.1:24567/g' \
     -e "s|/var/www/certbot|$TEST_ROOT/repo/certs/acme-webroot|g" nginx.conf > "$TEST_ROOT/sites.conf"
 cat > "$TEST_ROOT/nginx.conf" <<EOF
 pid $TEST_ROOT/nginx.pid;
